@@ -107,7 +107,7 @@ def main():
         # ("vnpy_rpcservice", "RpcServiceApp", "RPC服务应用"),
         
         # 模拟交易应用
-        ("vnpy_paperaccount", "PaperAccountApp", "模拟交易应用"),
+        # ("vnpy_paperaccount", "PaperAccountApp", "模拟交易应用"),
     ]
     
     # 动态加载应用
