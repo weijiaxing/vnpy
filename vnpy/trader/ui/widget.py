@@ -1226,6 +1226,7 @@ class GlobalDialog(QtWidgets.QDialog):
         super().__init__()
 
         self.widgets: dict[str, tuple[QtWidgets.QLineEdit, type]] = {}
+        self.language_combo: QtWidgets.QComboBox = None
 
         self.init_ui()
 
@@ -1240,12 +1241,34 @@ class GlobalDialog(QtWidgets.QDialog):
         # Initialize line edits and form layout based on setting.
         form: QtWidgets.QFormLayout = QtWidgets.QFormLayout()
 
-        for field_name, field_value in settings.items():
-            field_type: type = type(field_value)
-            widget: QtWidgets.QLineEdit = QtWidgets.QLineEdit(str(field_value))
+        # 导入语言相关函数
+        from vnpy.trader.locale import get_supported_languages, get_current_language
 
-            form.addRow(f"{field_name} <{field_type.__name__}>", widget)
-            self.widgets[field_name] = (widget, field_type)
+        for field_name, field_value in settings.items():
+            if field_name == "language":
+                # 为语言字段创建特殊的下拉选择控件
+                self.language_combo = QtWidgets.QComboBox()
+                
+                # 获取支持的语言列表
+                supported_languages = get_supported_languages()
+                current_language = get_current_language()
+                
+                # 填充下拉列表
+                for lang_code, lang_name in supported_languages.items():
+                    self.language_combo.addItem(lang_name, lang_code)
+                
+                # 设置当前选中的语言
+                current_index = list(supported_languages.keys()).index(current_language)
+                self.language_combo.setCurrentIndex(current_index)
+                
+                form.addRow(f"{field_name} <语言选择>", self.language_combo)
+            else:
+                # 普通字段使用文本输入框
+                field_type: type = type(field_value)
+                widget: QtWidgets.QLineEdit = QtWidgets.QLineEdit(str(field_value))
+
+                form.addRow(f"{field_name} <{field_type.__name__}>", widget)
+                self.widgets[field_name] = (widget, field_type)
 
         button: QtWidgets.QPushButton = QtWidgets.QPushButton(_("确定"))
         button.clicked.connect(self.update_setting)
@@ -1267,6 +1290,8 @@ class GlobalDialog(QtWidgets.QDialog):
         Get setting value from line edits and update global setting file.
         """
         settings: dict = {}
+        
+        # 处理普通字段
         for field_name, tp in self.widgets.items():
             widget, field_type = tp
             value_text: str = widget.text()
@@ -1281,12 +1306,24 @@ class GlobalDialog(QtWidgets.QDialog):
 
             settings[field_name] = field_value
 
+        # 处理语言字段
+        if self.language_combo:
+            selected_language = self.language_combo.currentData()
+            settings["language"] = selected_language
+            
+            # 立即切换语言
+            from vnpy.trader.locale import switch_language
+            switch_language(selected_language)
+
+        # 保存设置
+        save_json(SETTING_FILENAME, settings)
+        
+        # 显示提示信息
         QtWidgets.QMessageBox.information(
             self,
             _("注意"),
-            _("全局配置的修改需要重启后才会生效！"),
+            _("全局配置的修改需要重启后才会生效！\n\n语言设置已立即生效，但界面文字需要重启后更新。"),
             QtWidgets.QMessageBox.StandardButton.Ok
         )
 
-        save_json(SETTING_FILENAME, settings)
         self.accept()
