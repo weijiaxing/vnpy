@@ -1,58 +1,62 @@
-# VeighNa 快速入门 (macOS 版)
+# VeighNa 快速入门 (macOS 适配版)
 
-## 脚本运行
-除了使用图形化启动方式外，在 macOS 上建议使用针对 Mac 优化的启动脚本。
+本指南旨在帮助 macOS 用户在 **4.1.0+** 版本上快速搭建并启动环境。
 
-我们在根目录下创建了 `run.py`，它支持：
-1. **富途证券 (FutuGateway)**：支持港股、美股和 A 股通。
-2. **CTA 策略应用**：完整的 CTA 策略投研和实盘模块。
-3. **CTA 回测模块**：在本地进行策略历史回溯分析。
+---
 
-### 示例代码 (run.py)
+## 1. 环境准备 (Conda 独立环境)
 
-```python
-from vnpy.event import EventEngine
-from vnpy.trader.engine import MainEngine
-from vnpy.trader.ui import MainWindow, create_qapp
-from vnpy_futu import FutuGateway
-from vnpy_ctastrategy import CtaStrategyApp
-from vnpy_ctabacktester import CtaBacktesterApp
+在 macOS 上，强烈建议使用专用的虚拟环境以避免依赖冲突。
 
-def main():
-    qapp = create_qapp()
+### 1.1 激活环境
+进入项目目录后，运行：
+```bash
+conda activate ./venv
+```
+*(如果没有环境，请创建一个 Python 3.11 环境)*
 
-    event_engine = EventEngine()
-    main_engine = MainEngine(event_engine)
-    
-    # 添加富途网关 (Futu)
-    main_engine.add_gateway(FutuGateway, gateway_name="FUTU")
-    
-    # 添加应用模块 (CTA)
-    main_engine.add_app(CtaStrategyApp)
-    main_engine.add_app(CtaBacktesterApp)
-
-    main_window = MainWindow(main_engine, event_engine)
-    main_window.showMaximized()
-
-    qapp.exec()
-
-if __name__ == "__main__":
-    main()
+### 1.2 安装核心插件
+激活环境后，安装必要的网关和应用插件：
+```bash
+pip install vnpy_futu vnpy_ctastrategy vnpy_ctabacktester vnpy_sqlite -i https://pypi.vnpy.com
 ```
 
-### 运行步骤
+> [!TIP]
+> **富途网关源码安装**：如果 `pip` 安装 `vnpy_futu` 失败，请尝试：
+> `pip install https://github.com/vnpy/vnpy_futu/archive/master.tar.gz`
 
-1. **环境准备**：
-   确保已安装相关插件：
-   ```bash
-   pip install vnpy_futu vnpy_ctastrategy vnpy_ctabacktester
-   ```
+---
 
-2. **启动程序**：
-   在项目根目录下运行：
-   ```bash
-   python run.py
-   ```
+## 2. 脚本运行 (`run.py`)
 
-3. **连接富途**：
-   请确保你的电脑上已经启动并登录了 **FutuOpenD** 或 **Futu API** 客户端，否则无法完成行情连接。
+在 macOS 上，图形化启动可能由于部分底层 C++ 库（如 CTP）不兼容而报错。建议使用已适配的 `run.py`。
+
+### 脚本说明：
+- **已移除 CTP**：CTP 官方不提供 Mac 版 SDK。
+- **已集成富途 (Futu)**：默认加载富途证券网关。
+- **已加载 应用模块**：包含 CTA 策略引擎和回测引擎。
+
+### 启动命令：
+```bash
+python run.py
+```
+
+---
+
+## 3. 常见问题排查 (FAQ)
+
+### Q1: `ModuleNotFoundError: No module named 'vnpy_sqlite'`
+**解决**：补全数据库驱动插件。
+`pip install vnpy_sqlite -i https://pypi.vnpy.com`
+
+### Q2: 界面启动慢或卡顿
+**解决**：macOS 首次加载字体家族别名需要 1-2 秒，请稍候。
+
+### Q3: 无法连接富途行情
+**解决**：请确认你的电脑上已经启动并登录了 **FutuOpenD** 客户端。
+
+---
+
+## 4. 后续步骤
+- 在 `run.py` 中根据需要添加其他网关（如 OKX, Binance）。
+- 在 `MACOS_GUIDE.md` (已合并) 指引下，你可以开始正式的策略开发。
