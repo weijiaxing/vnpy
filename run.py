@@ -9,7 +9,7 @@ VeighNa Trader 启动脚本 (macOS 兼容版)
 3. 加载 CTA 策略和回测应用
 
 使用前请确保已安装相关插件：
-pip install vnpy_futu vnpy_ctastrategy vnpy_ctabacktester
+pip install vnpy_futu vnpy_ctastrategy vnpy_ctabacktester vnpy_datamanager
 """
 
 from vnpy.event import EventEngine
@@ -41,6 +41,7 @@ except ImportError:
 # ----------------------------------------------------------------------
 from vnpy_ctastrategy import CtaStrategyApp    # CTA 策略应用
 from vnpy_ctabacktester import CtaBacktesterApp  # CTA 回测分析应用
+from vnpy_datamanager import DataManagerApp      # 数据管理 (CSV 导入) 应用
 
 
 def main():
@@ -75,7 +76,8 @@ def main():
     # 5. 添加应用程序 (Add Apps)
     main_engine.add_app(CtaStrategyApp)      # 加载 CTA 策略模块
     main_engine.add_app(CtaBacktesterApp)    # 加载 CTA 回测模块
-    print("✓ 已加载 CTA 策略与回测应用")
+    main_engine.add_app(DataManagerApp)      # 加载数据管理模块
+    print("✓ 已加载 CTA 策略、回测与数据管理应用")
 
     # 6. 创建并显示主窗口 (GUI Setup)
     main_window = MainWindow(main_engine, event_engine)
