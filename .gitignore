@@ -8,6 +8,7 @@ venv/
 .venv/
 .env/
 vnpy_longbridge/
+vnpy_strategies/
 
 # Jupyter
 .ipynb_checkpoints
