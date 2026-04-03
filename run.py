@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+import os
+os.environ["LANG"] = "zh_CN.UTF-8"
+os.environ["LANGUAGE"] = "zh_CN"
+os.environ["LC_ALL"] = "zh_CN.UTF-8"
+
 """
 VeighNa Trader 启动脚本 (macOS 兼容版)
 =====================================
