@@ -29,6 +29,13 @@ except ImportError:
     FutuGateway = None
     print("✗ 未检测到 vnpy_futu 模块，请运行 'pip install vnpy_futu' 安装")
 
+# 长桥证券网关
+try:
+    from vnpy_longbridge import LongBridgeGateway
+except ImportError:
+    LongBridgeGateway = None
+    print("✗ 未检测到 vnpy_longbridge 模块，请运行 'pip install git+https://github.com/BrokerQL/vnpy_longbridge.git' 安装")
+
 # ----------------------------------------------------------------------
 # 应用 (Apps) 导入
 # ----------------------------------------------------------------------
@@ -55,6 +62,11 @@ def main():
     if FutuGateway:
         main_engine.add_gateway(FutuGateway, gateway_name="FUTU")
         print("✓ 已加载富途证券网关 (FutuGateway)")
+    
+    # 尝试加载长桥网关
+    if LongBridgeGateway:
+        main_engine.add_gateway(LongBridgeGateway, gateway_name="LONGBRIDGE")
+        print("✓ 已加载长桥证券网关 (LongBridgeGateway)")
     
     # ⚠️ 如何添加 CTP：
     # 如果你在 Windows/Linux 上运行，可以取消下面代码的注释来加载 CTP
