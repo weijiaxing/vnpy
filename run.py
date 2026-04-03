@@ -84,7 +84,36 @@ def main():
     main_engine.add_app(DataManagerApp)      # 加载数据管理模块
     print("✓ 已加载 CTA 策略、回测与数据管理应用")
 
-    # 6. 创建并显示主窗口 (GUI Setup)
+    # 6. 自动加载 vnpy_strategies 目录下的策略 (Automatic Strategy Loading)
+    from pathlib import Path
+    import sys
+    
+    project_root = Path(__file__).parent.absolute()
+    strategies_root = project_root / "vnpy_strategies"
+    
+    if strategies_root.exists():
+        if str(project_root) not in sys.path:
+            sys.path.insert(0, str(project_root))
+            
+        cta_engine = main_engine.get_engine(CtaStrategyApp.app_name)
+        backtester_engine = main_engine.get_engine(CtaBacktesterApp.app_name)
+        
+        loaded_folders = []
+        for subdir in strategies_root.iterdir():
+            if subdir.is_dir() and (subdir / "__init__.py").exists():
+                module_name = f"vnpy_strategies.{subdir.name}"
+                if cta_engine:
+                    cta_engine.load_strategy_class_from_folder(subdir, module_name)
+                if backtester_engine:
+                    backtester_engine.load_strategy_class_from_folder(subdir, module_name)
+                loaded_folders.append(subdir.name)
+        
+        if loaded_folders:
+            print(f"✓ 已从 {strategies_root.name} 自动加载分类策略: {', '.join(loaded_folders)}")
+    else:
+        print(f"⚠️ 未找到策略目录: {strategies_root}")
+
+    # 7. 创建并显示主窗口 (GUI Setup)
     main_window = MainWindow(main_engine, event_engine)
     main_window.showMaximized()
 
