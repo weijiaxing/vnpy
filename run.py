@@ -34,7 +34,7 @@ try:
     from vnpy_longbridge import LongBridgeGateway
 except ImportError:
     LongBridgeGateway = None
-    print("✗ 未检测到 vnpy_longbridge 模块，请运行 'pip install git+https://github.com/BrokerQL/vnpy_longbridge.git' 安装")
+    print("✗ 未检测到 vnpy_longbridge 模块，请运行 'pip install git+https://github.com/weijiaxing/vnpy_longbridge.git' 安装")
 
 # ----------------------------------------------------------------------
 # 应用 (Apps) 导入
